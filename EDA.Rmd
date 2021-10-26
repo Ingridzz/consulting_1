@@ -1,0 +1,184 @@
+---
+title: "EDA"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+pacman::p_load("tidyverse", "readxl", "esquisse","GGally","ggpubr","magrittr")
+
+#esquisser(data = df0, viewer = "browser")
+```
+
+```{r}
+#Select relevant columns and tidy data
+
+#import data
+df0 <- read_excel("master-beta-extract_Razan_edit.xlsx")
+
+#The last seven columns include differences pre/post. 
+#We can re-calculate these fields to ensure accuracy
+#select all columns except the last 7 columns
+df <- df0%>% select('subj':'post-rh-Hippocampus_rs')
+
+
+#column that start with pre and post can be made into a single column, so then 
+#in visualization we can "facet" by brain region
+df <- df %>%
+#pivot pre-region
+ pivot_longer(
+   cols = starts_with("pre-"),
+   names_to = "pre_region",
+   values_to = "pre_active"
+ ) %>%
+#pivot post-region
+ pivot_longer(
+   cols = starts_with("post-"),
+   names_to = "post_region",
+   values_to = "post_active"
+ )
+
+
+#separate pre/post column names into brain regions, so we can keep only rows
+#where the brain regions match
+
+#format pre-region column
+df <-  
+  separate(df,
+  "pre_region",
+  into = c('extra', 'pre_region'),
+  sep = 4,
+  remove = TRUE
+) 
+
+#format post region column 
+df <-   separate(
+  df,
+  "pre_region",
+  into = c('pre_reg', 'reg'),
+  sep = "_",
+  remove = TRUE
+)
+df <- separate(
+  df,
+  "post_region",
+  into = c('extra', 'post_reg'),
+  sep = 5,
+  remove = TRUE,
+  convert = FALSE,
+  extra = "warn",
+  fill = "warn"
+)
+
+df <- separate(
+  df,
+  "post_reg",
+  into = c('post_reg', 'reg'),
+  sep = "_",
+  remove = TRUE,
+  convert = FALSE,
+  extra = "warn",
+  fill = "warn"
+)
+
+#delete extra columns
+df %<>% select(-c(extra, reg,"delta_VO2max"))
+
+#keep columns where pre and post match
+df <- df[df$pre_reg == df$post_reg,]
+
+#calculate changes 
+df$vo2_ch <- df$PostVo2max - df$PreVo2max
+df$active_ch <- df$post_active - df$pre_active
+
+df_long <- df %>%
+ pivot_longer(
+   cols = c(pre_active, post_active),
+   names_to = "pre_post",
+   values_to = "active"
+ )
+
+```
+
+
+Change in VO2 max and change in activation
+```{r}
+p1 <- ggplot(df) +
+  aes(x = vo2_ch, y = active_ch, colour = Group) +
+  geom_point(shape = "circle", size = 2L) +
+  scale_color_hue(direction = 1) +
+  theme_minimal() +
+  geom_hline(yintercept=0, colour = "grey")+
+  geom_vline(xintercept=0, colour = "grey")+
+  facet_wrap(vars(pre_reg))+
+  labs(title = "Change in VO2 max and change in region activation")
+#ggsave('change.png', p1, width = 8, height = 6)
+p1
+```
+
+
+plot pre and post brain region activation
+```{r, echo=FALSE}
+p2 <- ggplot(df0) +
+  aes(y = PostVo2max - PreVo2max, x = Group) +
+  geom_jitter(width = 0.05) + 
+  theme_minimal()+
+  labs(title = "Change in VO2 Max", ylab("Change in VO2 max"))+
+  scale_x_discrete(labels= c("Exercise", "Resistance"))
+p2
+#ggsave('change_groups.png', p2)
+```
+
+plot pre and post activation activation
+```{r}
+p3 <- ggplot(df) +
+  aes(x = pre_active, y = post_active, colour = Group) +
+  geom_point(shape = "circle", size = 2L) +
+  scale_color_hue(direction = 1) +
+  theme_minimal() +
+  geom_hline(yintercept=0, colour = "grey")+
+  geom_vline(xintercept=0, colour = "grey")+
+  facet_wrap(vars(pre_reg)) +
+  labs(title = "Pre and Post Treatment Activation")
+#ggsave('active.png', p2, height = 6, width = 8)
+p3
+```
+
+
+```{r}
+#treatment group
+#create data with treatment group
+df_treat <- df_long[df_long$Group == "ET",]
+
+#make density plot
+t <- ggplot(df_treat,aes(x=active, fill =pre_post)) + geom_histogram(alpha=0.5, bins =6,position="identity")+
+  xlim(-1,0.5)+
+  ylim(0,10)+
+  facet_wrap(vars(pre_reg))+
+  labs(title = "Treatment group")
+
+
+
+#create data with control group
+df_cont <- df_long[df_long$Group == "RT",]
+
+#make density plot
+c <- ggplot(df_cont,aes(x=active, fill =pre_post)) + geom_histogram(alpha=0.5, bins = 6,position="identity")+
+  xlim(-1,0.5)+ ylim(0,10)+
+  facet_wrap(vars(pre_reg))+ 
+  labs(title = "Control group")
+
+#combine the figures
+figure <- ggarrange(c, t,  ncol = 2, nrow = 1, align = "v",
+                    common.legend = TRUE, legend="bottom")
+
+figure
+
+#save the figures
+#ggsave('density.png', figure, height = 6, width = 10)
+```
+
+Power of tests 
+EDA -- begin writing report -- not much significant due to sample size
