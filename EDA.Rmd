@@ -1,28 +1,40 @@
 ---
-title: "EDA"
+title: "Group 2's Consulting Report"
+author: "Kuangyou Chen, Yanbing Chen, Rose Determan, and Biyao Zhang"
 output:
   pdf_document: default
-  html_notebook: default
 ---
+# Introduction
+Razan came to us with questions about her study of the impact of exercise on 
+brain activation. She had three main questions.   
+\newline
+1. Are there differences in brain region activation before and after the 
+exercise intervention?  
+2. Is there a correlation between fitness and brain region activation?  
+3. Are there differences between the control group and the treatment group? 
+\newline
+Due to participant drop-out, there were 15 individuals in the study, and because
+of this many statistical tests would lack sufficient power to confidently make
+conclusions. If, for example, we ran an ANOVA test, we would risk having either
+a type I or type II error where we reject a hypothesis that is the true 
+hypothesis. Below, we have several figures that illustrate the data, but we do 
+not make conclusions about relationships between variables. 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE,warning = FALSE, message = FALSE)
 pacman::p_load("tidyverse", "readxl", "esquisse","GGally","ggpubr","magrittr")
 
 #esquisser(data = df0, viewer = "browser")
 ```
 
-```{r}
-#Select relevant columns and tidy data
+```{r Select relevant columns and tidy data}
 
 #import data
-df0 <- read_excel("master-beta-extract_Razan_edit.xlsx")
+df0 <- read_excel("master-beta-extract_Razan.xlsx")
+names(df0)[9] <- 'change_vo2'
 
 #The last seven columns include differences pre/post. 
-#We can re-calculate these fields to ensure accuracy
-#select all columns except the last 7 columns
 df <- df0%>% select('subj':'post-rh-Hippocampus_rs')
-
 
 #column that start with pre and post can be made into a single column, so then 
 #in visualization we can "facet" by brain region
@@ -84,7 +96,7 @@ df <- separate(
 )
 
 #delete extra columns
-df %<>% select(-c(extra, reg,"delta_VO2max"))
+df %<>% select(-c(extra, reg,"change_vo2"))
 
 #keep columns where pre and post match
 df <- df[df$pre_reg == df$post_reg,]
@@ -102,52 +114,80 @@ df_long <- df %>%
 
 ```
 
+# Change in VO$_2$ Max 
+The treatment group performed an aerobic/endurance exercise training program for 
+12 weeks (n=10). The control group performed a resistance training program for 
+12 weeks (n=5), since resistance training has been shown to not impact 
+cardiopulmonary fitness  
 
-Change in VO2 max and change in activation
-```{r}
-p1 <- ggplot(df) +
-  aes(x = vo2_ch, y = active_ch, colour = Group) +
+```{r, echo=FALSE, fig.height=3.1, fig.width=5, fig.align='center', fig.cap= "We can see the differing spreads in the treatment and control groups. The minimum and maximum change of VO$_2$ max in the control group is each more extreme than the minimum and maximum in the treatment group. In both groups, most participants have a positive change of max VO$_2$"}
+p2 <- ggplot(df0) +
+  aes(y = PostVo2max - PreVo2max, x = Group, color = Group) +
+  geom_jitter(width = 0.1, size = 2) + 
+  theme_minimal()+
+  labs(title = expression(paste("Change in ", VO[2]," Max: Treatment and Control",sep="")))+
+  ylab(expression(paste("Change in ", VO[2]," Max",sep="")))+
+  scale_x_discrete(labels= c("Exercise", "Resistance"))+
+  theme(legend.position = "none")
+p2
+#ggsave('change_groups.png', p2)
+```
+  
+
+# Change in VO$_2$ Max, Fitness, and Brain Activation
+The abscissa of each point in the below figure shows the change of VO$_2$ max, and 
+the y axis shows the change in brain region activation. The data are mainly 
+distributed in the first and fourth quadrants. As noted above, one participant 
+each in the control group and treatment group had a negative change in VO$_2$ max. 
+
+```{r, fig.height=6.2, fig.width=10, fig.align='center', fig.cap="Based on the plot, there is not a statistically significant difference in the change of VO$_2$ max between the treatment and control groups. Again, the range of VO$_2$ max in the control group is greater than that in the treatment group. The ranges for change in brain region activation are also similar in each region."}
+p1 <- ggplot(data = df, mapping = aes(x = vo2_ch, y = active_ch, colour = Group)) +
   geom_point(shape = "circle", size = 2L) +
-  scale_color_hue(direction = 1) +
-  theme_minimal() +
   geom_hline(yintercept=0, colour = "grey")+
   geom_vline(xintercept=0, colour = "grey")+
   facet_wrap(vars(pre_reg))+
-  labs(title = "Change in VO2 max and change in region activation")
+  labs(title = expression(paste("Change in ", VO[2]," Max and Brain Region Activation",sep="")))+
+  ylab("Activation Change")+
+  xlab("Fitness Change")+
+  scale_color_discrete(name="Treatment Group",
+                         breaks=c("ET", "RT"),
+                         labels=c("Exercise", "Resistance"))+
+  theme_minimal()
 #ggsave('change.png', p1, width = 8, height = 6)
 p1
 ```
 
+The below plot shows change in brain region activation for each measured region. 
+The x-axis shows the pre-treatment level of activation and the y-axis shows the 
+post-treatment level for the same participant. If a point falls in the first or 
+third quadrant, their activation remained either positive or negative for both 
+readings, but if a point is in the second or fourth quadrant, the activation 
+changed from either  
+1. negative in the first reading to positive in the second reading or  
+2. positive in the first reading to negative in the second reading. 
 
-plot pre and post brain region activation
-```{r, echo=FALSE}
-p2 <- ggplot(df0) +
-  aes(y = PostVo2max - PreVo2max, x = Group) +
-  geom_jitter(width = 0.05) + 
-  theme_minimal()+
-  labs(title = "Change in VO2 Max", ylab("Change in VO2 max"))+
-  scale_x_discrete(labels= c("Exercise", "Resistance"))
-p2
-#ggsave('change_groups.png', p2)
-```
-
-plot pre and post activation activation
-```{r}
-p3 <- ggplot(df) +
-  aes(x = pre_active, y = post_active, colour = Group) +
+```{r, fig.height=6.2, fig.width=10, fig.align='center', fig.cap = "Each region shows a slightly different pattern of points, but no single plot stands out as having a distinct pattern"}
+p3 <- ggplot(df, aes(x = pre_active, y = post_active, colour = Group)) +
   geom_point(shape = "circle", size = 2L) +
-  scale_color_hue(direction = 1) +
-  theme_minimal() +
   geom_hline(yintercept=0, colour = "grey")+
   geom_vline(xintercept=0, colour = "grey")+
   facet_wrap(vars(pre_reg)) +
-  labs(title = "Pre and Post Treatment Activation")
+  labs(title = "Pre and Post Treatment Activation")+
+  xlab("Pre-Treatment Activation")+
+  ylab("Post-Treatment Activation")+
+  scale_color_discrete(name="Treatment Group",
+                         breaks=c("ET", "RT"),
+                         labels=c("Exercise", "Resistance"))+
+  theme_minimal() 
 #ggsave('active.png', p2, height = 6, width = 8)
 p3
 ```
 
+Below is a slightly different way to evaluate change in brain region activation. 
+Instead of a scatterplot we have created a histogram.
 
-```{r}
+
+```{r, fig.height=6.2, fig.width=10, fig.align='center', fig.cap = " Since there is overlap between the bars, there is not a strong difference in pre and post treatment brain region level of activation."}
 #treatment group
 #create data with treatment group
 df_treat <- df_long[df_long$Group == "ET",]
@@ -155,9 +195,13 @@ df_treat <- df_long[df_long$Group == "ET",]
 #make density plot
 t <- ggplot(df_treat,aes(x=active, fill =pre_post)) + geom_histogram(alpha=0.5, bins =6,position="identity")+
   xlim(-1,0.5)+
-  ylim(0,10)+
+  scale_y_continuous(breaks=seq(0,10,by=2),limits = c(0,10))+
   facet_wrap(vars(pre_reg))+
-  labs(title = "Treatment group")
+  labs(title = "Treatment group region activation")+
+  xlab("Activation")+
+  ylab("Count")+
+  theme(legend.position = "none")+
+  theme_minimal()
 
 
 
@@ -166,10 +210,18 @@ df_cont <- df_long[df_long$Group == "RT",]
 
 #make density plot
 c <- ggplot(df_cont,aes(x=active, fill =pre_post)) + geom_histogram(alpha=0.5, bins = 6,position="identity")+
-  xlim(-1,0.5)+ ylim(0,10)+
+  xlim(-1,0.5)+ 
+  scale_y_continuous(breaks=seq(0,10,by=2),limits = c(0,10))+
   facet_wrap(vars(pre_reg))+ 
-  labs(title = "Control group")
+  labs(title = "Control group region activation")+
+  xlab("Activation")+
+  ylab("Count")+
+  scale_fill_discrete(name="Measurement Time",
+                         breaks=c("pre_active", "post_active"),
+                         labels=c("Pre-Treatment", "Post-Treatment"))+
+  theme_minimal()
 
+   
 #combine the figures
 figure <- ggarrange(c, t,  ncol = 2, nrow = 1, align = "v",
                     common.legend = TRUE, legend="bottom")
@@ -177,8 +229,22 @@ figure <- ggarrange(c, t,  ncol = 2, nrow = 1, align = "v",
 figure
 
 #save the figures
-#ggsave('density.png', figure, height = 6, width = 10)
+#ggsave('density.png', figure, height = 6.2, width = 10)
 ```
 
-Power of tests 
-EDA -- begin writing report -- not much significant due to sample size
+# Conclusion
+**Client Questions**  
+1. Are there differences in brain region activation before and after the 
+exercise intervention?  
+2. Is there a correlation between fitness and brain region activation?  
+3. Are there differences between the control group and the treatment group?   
+\newline
+
+Based on the provided data, the exercise intervention leads to impacts of 
+varying degrees depending on the individual. Based on our exploratory 
+analysis, there is not a strong linear relationship between fitness and brain 
+region activation. ***Do we have a line of code for this?*** **The coefficients 
+in the correlation test are small enough to show a lack of significance.** 
+The differences between control and treatment groups follow a similar pattern and
+we were not able to detect a significant difference. 
+
