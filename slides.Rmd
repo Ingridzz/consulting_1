@@ -1,0 +1,29 @@
+---
+title: "Consulting Presentation"
+author: "Kuangyou Chen, Yanbing Chen, Rose Determan, and Biyao Zhang"
+date: "11/11/2021"
+output: 
+  revealjs::revealjs_presentation:
+        theme: simple
+
+---
+<style type="text/css">
+p { text-align: left; }
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Introduction
+Client questions
+
+## 
+
+
+## Slide with R Output
+
+
+## Conclusions and Next Steps
+
+
