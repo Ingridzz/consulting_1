@@ -234,7 +234,7 @@ Figure 4 is a slightly different way to evaluate change in brain region activati
 2. Is there a correlation between fitness and brain region activation?  
 3. Are there differences between the control group and the treatment group?
 \newline
-Based on the provided data, the exercise intervention leads to impacts of varying degrees depending on the individual. Based on our exploratory analysis, there is not a strong linear relationship between fitness and brain region activation.The differences between control and treatment groups follow a similar pattern and we were not able to detect a significant difference. 
+Based on the provided data, the exercise intervention leads to impacts of varying degrees depending on the individual. Based on our EDA, there is not a detectable linear relationship between fitness and brain region activation.The differences between control and treatment groups follow a similar pattern and we were not able to detect a significant difference. In future studies we would recommend a larger sample size. We would be happy to consult on suggested sample sizes for future projects. 
 
 *Original*
 According to clients’ questions, there are huge differences in brain activation before and after exercise intervention.The exercise intervention leads to impacts in varying degrees.  As for the control group, the hippocampus shows a small rise at peak, while the entorhinal and right parahippocampal shows large and positive fluctuations. Additionally, the peak of the left parahippocampal dramatically decreases. For the treatment group, most of the brain shows negative fluctuations except for the left hippocampus.   

@@ -5,24 +5,27 @@ date: "11/11/2021"
 output: 
   revealjs::revealjs_presentation:
         theme: simple
-
 ---
 <style type="text/css">
 p { text-align: left; }
+.reveal section img { background:none; border:none; box-shadow:none; }
 </style>
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
-
 ## Introduction
 Client questions
+## 
+<img src="Fig1.png" width="1000" height="620" border:0/>
 
 ## 
+<img src="Fig2.png" width="1000" height="620" border:0/>
 
+## 
+<img src="Fig3.png" width="1000" height="620" border:0/>
 
-## Slide with R Output
-
+## 
+<img src="Fig4.png" width="1000" height="620" border:0/>
 
 ## Conclusions and Next Steps
 
