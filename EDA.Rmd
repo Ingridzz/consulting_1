@@ -115,12 +115,15 @@ df_long <- df %>%
 ```
 
 # Change in VO$_2$ Max 
-The treatment group performed an aerobic/endurance exercise training program for 
-12 weeks (n=10). The control group performed a resistance training program for 
-12 weeks (n=5), since resistance training has been shown to not impact 
-cardiopulmonary fitness  
+*Edits*  
+The treatment group performed an aerobic/endurance exercise training program for 12 weeks (n=10). The control group performed a resistance training program for 12 weeks (n=5), since resistance training has been shown to not impact cardiopulmonary fitness.  
+We can see the differing spreads in the treatment and control groups. The minimum and maximum change of VO$_2$ max in the control group is each more extreme than the minimum and maximum in the treatment group. In both groups, most participants have a positive change of max VO$_2$
 
-```{r, echo=FALSE, fig.height=3.1, fig.width=5, fig.align='center', fig.cap= "We can see the differing spreads in the treatment and control groups. The minimum and maximum change of VO$_2$ max in the control group is each more extreme than the minimum and maximum in the treatment group. In both groups, most participants have a positive change of max VO$_2$"}
+*Original*
+The control group performed a resistance training program for 12 weeks(N=5), since resistance training has been shown to not impact cardiopulmonary fitness. The treatment group performed an aerobic/endurance exercise training program for 12 weeks(N=10).
+Based on the picture above, we can draw a conclusion that the change of Vo2Max between treatment group and control is different. The maximum change of Vo2Max in the control group is greater than the maximum change in the treatment group. And the minimum change of Vo2Max in the control group is less than the minimum change in the treatment group. In the treatment group, most of the change of Vo2Max is positive.
+
+```{r, echo=FALSE, fig.height=3.1, fig.width=5, fig.align='center', fig.cap= ""}
 p2 <- ggplot(df0) +
   aes(y = PostVo2max - PreVo2max, x = Group, color = Group) +
   geom_jitter(width = 0.1, size = 2) + 
@@ -135,12 +138,13 @@ p2
   
 
 # Change in VO$_2$ Max, Fitness, and Brain Activation
-The abscissa of each point in the below figure shows the change of VO$_2$ max, and 
-the y axis shows the change in brain region activation. The data are mainly 
-distributed in the first and fourth quadrants. As noted above, one participant 
-each in the control group and treatment group had a negative change in VO$_2$ max. 
+*Edits*
+The abscissa of each point in the below figure shows the change of VO$_2$ max, and the y axis shows the change in brain region activation. The data are mainly distributed in the first and fourth quadrants. In the entorhinal, hippocampus and parahippocampal regions of the left and right brains, a small number of data in the control group and treatment group had a negative change in VO$_2$ max, and the rest are positive.  Based on the plot, there is not a statistically significant difference in the change of VO$_2$ max between the treatment and control groups since the range of VO$_2$ max in the control group is greater than that in the treatment group. 
+*Original*
+The abscissa of each point in the above figure shows the change of Vo2Max, and the data is mainly distributed in the first and fourth quadrants. In the entorhinal, hippocampus and parahippocampal regions of the left and right brains, a small number of data in the control group and treatment group had a negative change in Vo2Max, and the rest are positive. There is no significant difference in the change of Vo2Max between the treatment group and control group. The maximum change of Vo2Max in the control group is always greater than the maximum change of Vo2Max in the treatment group.
 
-```{r, fig.height=6.2, fig.width=10, fig.align='center', fig.cap="Based on the plot, there is not a statistically significant difference in the change of VO$_2$ max between the treatment and control groups. Again, the range of VO$_2$ max in the control group is greater than that in the treatment group. The ranges for change in brain region activation are also similar in each region."}
+
+```{r, fig.height=6.2, fig.width=10, fig.align='center', fig.cap=""}
 p1 <- ggplot(data = df, mapping = aes(x = vo2_ch, y = active_ch, colour = Group)) +
   geom_point(shape = "circle", size = 2L) +
   geom_hline(yintercept=0, colour = "grey")+
@@ -157,16 +161,12 @@ p1 <- ggplot(data = df, mapping = aes(x = vo2_ch, y = active_ch, colour = Group)
 p1
 ```
 
-The below plot shows change in brain region activation for each measured region. 
-The x-axis shows the pre-treatment level of activation and the y-axis shows the 
-post-treatment level for the same participant. If a point falls in the first or 
-third quadrant, their activation remained either positive or negative for both 
-readings, but if a point is in the second or fourth quadrant, the activation 
-changed from either  
+The below plot shows change in brain region activation for each measured region. The x-axis shows the pre-treatment level of activation and the y-axis shows the post-treatment level for the same participant. If a point falls in the first or third quadrant, their activation remained either positive or negative for both readings, but if a point is in the second or fourth quadrant, the activationchanged from either  
 1. negative in the first reading to positive in the second reading or  
-2. positive in the first reading to negative in the second reading. 
+2. positive in the first reading to negative in the second reading.   
+Each region shows a slightly different pattern of points, but no single plot stands out as having a distinct pattern. 
 
-```{r, fig.height=6.2, fig.width=10, fig.align='center', fig.cap = "Each region shows a slightly different pattern of points, but no single plot stands out as having a distinct pattern"}
+```{r, fig.height=6.2, fig.width=10, fig.align='center', fig.cap = ""}
 p3 <- ggplot(df, aes(x = pre_active, y = post_active, colour = Group)) +
   geom_point(shape = "circle", size = 2L) +
   geom_hline(yintercept=0, colour = "grey")+
@@ -185,7 +185,6 @@ p3
 
 Below is a slightly different way to evaluate change in brain region activation. 
 Instead of a scatterplot we have created a histogram.
-
 
 ```{r, fig.height=6.2, fig.width=10, fig.align='center', fig.cap = " Since there is overlap between the bars, there is not a strong difference in pre and post treatment brain region level of activation."}
 #treatment group
@@ -233,18 +232,22 @@ figure
 ```
 
 # Conclusion
+*Edits*
 **Client Questions**  
-1. Are there differences in brain region activation before and after the 
-exercise intervention?  
+1. Are there differences in brain region activation before and after the exercise intervention?  
 2. Is there a correlation between fitness and brain region activation?  
 3. Are there differences between the control group and the treatment group?   
 \newline
 
-Based on the provided data, the exercise intervention leads to impacts of 
-varying degrees depending on the individual. Based on our exploratory 
-analysis, there is not a strong linear relationship between fitness and brain 
-region activation. ***Do we have a line of code for this?*** **The coefficients 
-in the correlation test are small enough to show a lack of significance.** 
-The differences between control and treatment groups follow a similar pattern and
-we were not able to detect a significant difference. 
+Based on the provided data, the exercise intervention leads to impacts of varying degrees depending on the individual. Based on our exploratory analysis, there is not a strong linear relationship between fitness and brain region activation.The differences between control and treatment groups follow a similar pattern and we were not able to detect a significant difference. 
+
+*Original*
+According to clients’ questions, there are huge differences in brain activation before and after exercise intervention.The exercise intervention leads to impacts in varying degrees.  As for the control group, the hippocampus shows a small rise at peak, while the entorhinal and right parahippocampal shows large and positive fluctuations. Additionally, the peak of the left parahippocampal dramatically decreases. For the treatment group, most of the brain shows negative fluctuations except for the left hippocampus. 
+
+ ***Do we have a line of code for this?*** **  
+***Based on the computational output, there is no linear relationship between fitness and brain region activation. The coefficients in the correlation test are small enough to show non statistically significance.***   
+
+The differences between control and experimental groups are also significant. As is shown in the image, the group with aerobic/endurance exercises training program shows the opposite tendency and volatility. 
+
+
 
