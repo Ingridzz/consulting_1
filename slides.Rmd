@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 ## Introduction
 Client questions
+
 ## 
 <img src="Fig1.png" width="1000" height="620" border:0/>
 
