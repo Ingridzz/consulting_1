@@ -22,6 +22,8 @@ pacman::p_load("tidyverse", "readxl", "esquisse","GGally","ggpubr","magrittr")
 ```
 ```{r Select relevant columns and tidy data}
 
+text_size <- 15
+
 #import data
 df0 <- read_excel("master-beta-extract_Razan.xlsx")
 names(df0)[9] <- 'change_vo2'
@@ -117,9 +119,10 @@ p2 <- ggplot(df0) +
   labs(title = expression(paste("Change in ", VO[2]," Max: Treatment and Control",sep="")))+
   ylab(expression(paste("Change in ", VO[2]," Max",sep="")))+
   scale_x_discrete(labels= c("Exercise", "Resistance"))+
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+  theme(text = element_text(size = text_size))   
 p2
-#ggsave('Fig1.png', p2)
+ggsave('Fig1.png', p2)
 ```
 
 *Edits*  
@@ -149,8 +152,9 @@ p1 <- ggplot(data = df, mapping = aes(x = vo2_ch, y = active_ch, colour = Group)
   scale_color_discrete(name="Treatment Group",
                          breaks=c("ET", "RT"),
                          labels=c("Exercise", "Resistance"))+
-  theme_minimal()
-#ggsave('Fig2.png', p1)
+  theme_minimal()+
+  theme(text = element_text(size = text_size))   
+ggsave('Fig2.png', p1)
 p1
 ```
 
@@ -170,8 +174,9 @@ p3 <- ggplot(df, aes(x = pre_active, y = post_active, colour = Group)) +
   scale_color_discrete(name="Treatment Group",
                          breaks=c("ET", "RT"),
                          labels=c("Exercise", "Resistance"))+
-  theme_minimal() 
-#ggsave('Fig3.png', p3, height = 6, width = 10)
+  theme_minimal() +
+  theme(text = element_text(size = text_size)) 
+ggsave('Fig3.png', p3, height = 6, width = 10)
 p3
 ```
 
@@ -195,7 +200,8 @@ t <- ggplot(df_treat,aes(x=active, fill =pre_post)) + geom_histogram(alpha=0.5, 
   xlab("Activation")+
   ylab("Count")+
   theme(legend.position = "none")+
-  theme_minimal()
+  theme_minimal()+
+  theme(text = element_text(size = text_size)) 
 
 
 #create data with control group
@@ -212,7 +218,8 @@ c <- ggplot(df_cont,aes(x=active, fill =pre_post)) + geom_histogram(alpha=0.5, b
   scale_fill_discrete(name="Measurement Time",
                          breaks=c("pre_active", "post_active"),
                          labels=c("Pre-Treatment", "Post-Treatment"))+
-  theme_minimal()
+  theme_minimal()+
+  theme(text = element_text(size = text_size)) 
 
    
 #combine the figures
@@ -222,7 +229,7 @@ figure <- ggarrange(c, t,  ncol = 2, nrow = 1, align = "v",
 figure
 
 #save the figures
-#ggsave('Fig4.png', figure, height = 6.2, width = 10)
+ggsave('Fig4.png', figure, height = 6.2, width = 10)
 ```
 
 Figure 4 is a slightly different way to evaluate change in brain region activation. Instead of a scatterplot we have created a histogram. Since there is overlap between the bars, there is not a strong difference in pre and post treatment brain region level of activation.

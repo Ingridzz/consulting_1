@@ -5,29 +5,59 @@ date: "11/11/2021"
 output: 
   revealjs::revealjs_presentation:
         theme: simple
+        incremental: true
 ---
 <style type="text/css">
 p { text-align: left; }
 .reveal section img { background:none; border:none; box-shadow:none; }
+
+display: inline-block;
+    font-size: 0.6em;
+    line-height: 1.2em;
+    vertical-align: top;
+    text-align: left;
 </style>
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
-## Introduction
-Client questions
+# Introduction
 
-## 
+**Topic:** Brain activity and Exercise
+<br><br>
+
+::: fragment
+**Client Questions: **  
+1. Before and after treatment differences  
+2. Correlation between brain region and fitness  
+3. Control vs. treatment groups
+:::
+<br>
+
+::: fragment
+**Issue:** small sample size (n= 15)   
+:::
+
+::: fragment
+**Solution: **  
+- present EDA  
+- suggest larger sample size  
+:::
+
+
+# 
 <img src="Fig1.png" width="1000" height="620" border:0/>
 
-## 
+# 
 <img src="Fig2.png" width="1000" height="620" border:0/>
 
-## 
+# 
 <img src="Fig3.png" width="1000" height="620" border:0/>
 
-## 
+# 
 <img src="Fig4.png" width="1000" height="620" border:0/>
 
-## Conclusions and Next Steps
+# Conclusions and Next Steps
 
 
