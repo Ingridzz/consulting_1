@@ -13,7 +13,6 @@ Razan came to us with questions about her study of the impact of exercise on bra
 \newline
 Due to participant drop-out, there were 15 individuals in the study. This small sample size is a limitation, since many statistical tests would lack sufficient power to confidently make conclusions. If, for example, we ran an ANOVA test, we would risk having either a type I or type II error where we reject a hypothesis that is the true 
 hypothesis. Below, we have completed an exploratory data analysis (EDA) with several figures that illustrate the data, but we do  not make conclusions about relationships between variables. 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,warning = FALSE, message = FALSE)
 pacman::p_load("tidyverse", "readxl", "esquisse","GGally","ggpubr","magrittr")
@@ -22,7 +21,7 @@ pacman::p_load("tidyverse", "readxl", "esquisse","GGally","ggpubr","magrittr")
 ```
 ```{r Select relevant columns and tidy data}
 
-text_size <- 15
+text_size <- 10
 
 #import data
 df0 <- read_excel("master-beta-extract_Razan.xlsx")
@@ -100,14 +99,49 @@ df <- df[df$pre_reg == df$post_reg,]
 df$vo2_ch <- df$PostVo2max - df$PreVo2max
 df$active_ch <- df$post_active - df$pre_active
 
+#create longer version -- pre and post are in same column with another column as an indicator
 df_long <- df %>%
  pivot_longer(
    cols = c(pre_active, post_active),
-   names_to = "pre_post",
-   values_to = "active"
+   names_to = "time",
+   values_to = "activation"
  )
 
+df_long %<>%
+ pivot_longer(
+   cols = c(PreVo2max, PostVo2max),
+   names_to = "time_",
+   values_to = "vo2max"
+ )
+
+df_long$time %<>% recode(
+  "pre_active" = 0,
+  "post_active"= 1
+)
+
+df_long$time_ %<>% recode(
+  "PreVo2max" = 0,
+  "PostVo2max"= 1
+)
+
+#keep columns where pre and post match
+df_long <- df_long[df_long$time == df_long$time_,]
 ```
+
+
+```{r}
+ggplot(data = df_long, aes(x= time, y = activation, group = subj, color = as.factor(Group)))+ 
+  geom_line(size = 1.2, alpha = 0.5)+
+  facet_wrap(vars(pre_reg))
+
+
+
+ggplot(data = df_long, aes(x= time, y = vo2max, group = subj, color = Age))+ 
+  geom_line(size = 1.2)+
+  facet_wrap(vars(Group))+
+  scale_color_viridis_c()
+```
+
 
 
 # Change in VO$_2$ Max 
@@ -176,7 +210,7 @@ p3 <- ggplot(df, aes(x = pre_active, y = post_active, colour = Group)) +
                          labels=c("Exercise", "Resistance"))+
   theme_minimal() +
   theme(text = element_text(size = text_size)) 
-ggsave('Fig3.png', p3, height = 6, width = 10)
+#ggsave('Fig3.png', p3, height = 6, width = 10)
 p3
 ```
 
@@ -192,7 +226,7 @@ Each region shows a slightly different pattern of points, but no single plot sta
 df_treat <- df_long[df_long$Group == "ET",]
 
 #make density plot
-t <- ggplot(df_treat,aes(x=active, fill =pre_post)) + geom_histogram(alpha=0.5, bins =6,position="identity")+
+t <- ggplot(df_treat,aes(x=activation, fill =time)) + geom_histogram(alpha=0.5, bins =6,position="identity")+
   xlim(-1,0.5)+
   scale_y_continuous(breaks=seq(0,10,by=2),limits = c(0,10))+
   facet_wrap(vars(pre_reg))+
@@ -208,7 +242,7 @@ t <- ggplot(df_treat,aes(x=active, fill =pre_post)) + geom_histogram(alpha=0.5, 
 df_cont <- df_long[df_long$Group == "RT",]
 
 #make density plot
-c <- ggplot(df_cont,aes(x=active, fill =pre_post)) + geom_histogram(alpha=0.5, bins = 6,position="identity")+
+c <- ggplot(df_cont,aes(x=activation, fill =time)) + geom_histogram(alpha=0.5, bins = 6,position="identity")+
   xlim(-1,0.5)+ 
   scale_y_continuous(breaks=seq(0,10,by=2),limits = c(0,10))+
   facet_wrap(vars(pre_reg))+ 
@@ -228,9 +262,19 @@ figure <- ggarrange(c, t,  ncol = 2, nrow = 1, align = "v",
 
 figure
 
+rm(df_cont)
+rm(df_treat)
 #save the figures
 ggsave('Fig4.png', figure, height = 6.2, width = 10)
 ```
+
+
+```{r}
+ggplot(data = df_long)+
+  geom_line(aes(x = ))
+
+```
+
 
 Figure 4 is a slightly different way to evaluate change in brain region activation. Instead of a scatterplot we have created a histogram. Since there is overlap between the bars, there is not a strong difference in pre and post treatment brain region level of activation.
 
