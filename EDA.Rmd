@@ -141,7 +141,28 @@ ggplot(data = df_long, aes(x= time, y = vo2max, group = subj, color = Age))+
   facet_wrap(vars(Group))+
   scale_color_viridis_c()
 ```
+Suggested sample size  
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2876926/  
+```{r}
+z <- 1.96 #5% alpha error
+z_b <- 1.2816  #90% power of the study
 
+
+#sample size fitness
+#select un-duplucated records
+ind <- df[!duplicated(df$subj),]
+se <- sd(c(ind$PreVo2max, ind$PostVo2max))/sqrt(30)
+sd <- sd(c(ind$PreVo2max, ind$PostVo2max))
+#standard deviation
+delta <- 0.15 #effect size
+
+
+moe <- z*se
+
+(z*2 * sd * (1-sd))/(moe*2)
+
+
+```
 
 
 # Change in VO$_2$ Max 
