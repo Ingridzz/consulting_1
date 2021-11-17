@@ -246,7 +246,6 @@ df_cont <- df_long[df_long$Group == "RT",]
 #make density plot
 c <- ggplot(df_cont,aes(x=activation, fill =time)) + geom_histogram(alpha=0.5, bins = 6,position="identity")+
   xlim(-1,0.5)+ 
-  scale_y_continuous(breaks=seq(0,10,by=2),limits = c(0,10))+
   facet_wrap(vars(pre_reg))+ 
   labs(title = "Control group region activation")+
   xlab("Activation")+
@@ -269,14 +268,6 @@ rm(df_treat)
 #save the figures
 ggsave('Fig4.png', figure, height = 6.2, width = 10)
 ```
-
-
-```{r}
-ggplot(data = df_long)+
-  geom_line(aes(x = ))
-
-```
-
 
 Figure 4 is a slightly different way to evaluate change in brain region activation. Instead of a scatterplot we have created a histogram. Since there is overlap between the bars, there is not a strong difference in pre and post treatment brain region level of activation.
 
