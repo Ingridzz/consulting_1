@@ -1,35 +1,39 @@
 ---
-title: "Group 2's Consulting Report"
+title: "\\fontsize{16pt}{3pt} \\textbf{Group 2's Consulting Report}"
 author: "Kuangyou Chen, Yanbing Chen, Rose Determan, and Biyao Zhang"
 output:
   pdf_document: default
+header-includes:
+  - \usepackage{titling}
+  - \pretitle{\begin{flushleft}}
+  - \posttitle{\end{flushleft}}  
+  - \preauthor{\begin{flushleft}}
+  - \postauthor{\end{flushleft}}  
+  - \predate{\begin{flushleft}}
+  - \postdate{\end{flushleft}}
+  - \usepackage{graphicx}
+  - \usepackage{float}  
+geometry: "left=1in,right=1in,top=.8in, bottom=.8in"
 ---
 # Introduction
-Razan came to us with questions about her study of the impact of exercise on brain activation. She had three main questions.   
-\newline
+Razan came to us with questions about her study of the impact of exercise on brain activation. She had three main questions.
 1. Are there differences in brain region activation before and after the exercise intervention?  
 2. Is there a correlation between fitness and brain region activation?  
 3. Are there differences between the control group and the treatment group? 
-\newline
 Due to participant drop-out, there were 15 individuals in the study. This small sample size is a limitation, since many statistical tests would lack sufficient power to confidently make conclusions. If, for example, we ran an ANOVA test, we would risk having either a type I or type II error where we reject a hypothesis that is the true 
 hypothesis. Below, we have completed an exploratory data analysis (EDA) with several figures that illustrate the data, but we do  not make strong conclusions about relationships between variables. 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,warning = FALSE, message = FALSE)
-pacman::p_load("tidyverse", "readxl", "esquisse","GGally","ggpubr","magrittr", "DescTools")
-
-#esquisser(data = df0, viewer = "browser")
+pacman::p_load("readxl","GGally","ggpubr","magrittr", "DescTools","dplyr","tidyverse","knitr","sjPlot", "sjmisc","modelsummary")
 ```
 
 ```{r Select relevant columns and tidy data}
-
-text_size <- 10
-
 #import data
 df0 <- read_excel("master-beta-extract_Razan.xlsx")
 names(df0)[9] <- 'change_vo2'
 
 #The last seven columns include differences pre/post. 
-df <- df0%>% select('subj':'post-rh-Hippocampus_rs')
+df <- dplyr::select(df0, 'subj':'post-rh-Hippocampus_rs')
 
 #column that start with pre and post can be made into a single column, so then 
 #in visualization we can "facet" by brain region
@@ -91,7 +95,7 @@ df <- separate(
 )
 
 #delete extra columns
-df %<>% select(-c(extra, reg,"change_vo2"))
+df %<>% dplyr::select(-c(extra, reg,"change_vo2"))
 
 #keep columns where pre and post match
 df <- df[df$pre_reg == df$post_reg,]
@@ -115,24 +119,24 @@ df_long %<>%
    values_to = "vo2max"
  )
 
-df_long$time %<>% recode(
+df_long$time %<>% dplyr::recode(
   "pre_active" = 0,
   "post_active"= 1
 )
 
-df_long$time_ %<>% recode(
+df_long$time_ %<>% dplyr::recode(
   "PreVo2max" = 0,
   "PostVo2max"= 1
 )
 
 #keep columns where pre and post match
 df_long <- df_long[df_long$time == df_long$time_,]
+
+text_size <- 10
 ```
 
-
-
-
-# Change in VO$_2$ Max 
+# 1. Change in VO$_2$ Max   
+The treatment group performed an aerobic/endurance exercise training program for 12 weeks (n=10). The control group performed a resistance training program for 12 weeks (n=5), since resistance training has been shown to not impact cardiopulmonary fitness.  
 ```{r Figure 1, echo=FALSE, fig.height=3.1, fig.width=5, fig.align='center', fig.cap="We can see the differing spreads in the treatment and control groups. The minimum and maximum change of VO$_2$ max in the control group is each more extreme than the minimum and maximum in the treatment group. In both groups, most participants have a positive change of max VO$_2$."}
 p2 <- ggplot(df0) +
   aes(y = PostVo2max - PreVo2max, x = Group, color = Group) +
@@ -146,14 +150,32 @@ p2 <- ggplot(df0) +
 p2
 ggsave('Fig1.png', p2)
 ```
-
-The treatment group performed an aerobic/endurance exercise training program for 12 weeks (n=10). The control group performed a resistance training program for 12 weeks (n=5), since resistance training has been shown to not impact cardiopulmonary fitness.  
-
- 
 \newpage
-# Change in VO$_2$ Max and Brain Activation
-The abscissa of each point in the below figure shows the change of VO$_2$ max, and the y axis shows the change in brain region activation (Figure 2). The data are mainly distributed in the first and fourth quadrants.   Based on the plot the range of VO$_2$ max in the control group is greater than that in the treatment group.   
-```{r Figure 2, fig.height=3.1, fig.width=7.5, fig.align='center', fig.cap="In the entorhinal, hippocampus and parahippocampal regions of the left and right brains, a small number of data in the control group and treatment group had a negative change in VO$_2$ max, and the rest are positive."}
+
+# 2. Change in VO$_2$ Max and Brain Activation
+Figure 2 shows the individual's changes in brain region activation before and after treatment and color coded by treatment group. The light background lines represent individual measurements, and the bold line is a linear regression for each group. There is a general trend of increase in region activation, although the standard errors for the regression are large.
+```{r Figure 2, fig.pos='H',fig.height=4.5, fig.width=7.5, fig.align='center', fig.cap = "We can see that, in general, participants had a slight change in region activation , regardless of treatment group, although we also see that some individuals had more extreme changes "}
+ggplot(data = df_long, aes(x= as.numeric(time), y = as.numeric(activation), color = as.factor(Group)))+ 
+  geom_line(aes(group = subj), size = 1, alpha = 0.3)+
+  geom_smooth(method = 'lm', show.legend = TRUE,aes(group = Group), size = 1.25, se = FALSE)+
+  facet_wrap(vars(pre_reg))+
+  labs(title = expression("Change in Brain Region Activation"))+
+  ylab(expression("Region Activation"))+
+  xlab("Time")+
+  scale_color_discrete(name="Treatment Group",
+                         breaks=c("ET", "RT"),
+                         labels=c("Exercise", "Resistance"))+
+  scale_x_continuous(breaks = c(0,1))+
+  theme_minimal()+
+   theme(axis.line = element_line(color='black'),
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank())
+```
+
+The abscissa of each point in Figure 3, below, shows the change of VO$_2$ max, and the y axis shows the change in brain region activation. Based on the plot the range of VO$_2$ max in the control group is greater than that in the treatment group.   
+```{r Figure 3, fig.height=3.1, fig.width=7.5, fig.align='center', fig.cap="The data are mainly distributed in the first and fourth quadrants. In the entorhinal, hippocampus and parahippocampal regions of the left and right brains, a small number of data in the control group and treatment group had a negative change in VO$_2$ max, and the rest are positive."}
 p1 <- ggplot(data = df, mapping = aes(x = vo2_ch, y = active_ch, colour = Group)) +
   geom_point(shape = "circle", size = 2L) +
   geom_hline(yintercept=0, colour = "grey")+
@@ -167,44 +189,35 @@ p1 <- ggplot(data = df, mapping = aes(x = vo2_ch, y = active_ch, colour = Group)
                          labels=c("Exercise", "Resistance"))+
   theme_minimal()+
   theme(text = element_text(size = text_size))   
-ggsave('Fig2.png', p1)
+#ggsave('Fig2.png', p1)
 p1
 ```
 
 \newpage
-
-
-Figure 3 shows the individual's changes in brain region activation before and after treatment and color coded by treatment group. 
-
-```{r Figure 3, fig.height=3.1, fig.width=7.5, fig.align='center', fig.cap = "We can see that, in general, participants had a slight increase in region activation , regardless of treatment group, although we also see that some had a decrease. "}
-ggplot(data = df_long, aes(x= time, y = activation, group = subj, color = as.factor(Group)))+ 
-  geom_line(size = 1.2, alpha = 0.75)+
-  facet_wrap(vars(pre_reg))+
-  labs(title = expression("Change in Brain Region Activation"))+
-  ylab(expression("Region Activation"))+
-  xlab("Time")+
-  scale_color_discrete(name="Treatment Group",
-                         breaks=c("ET", "RT"),
-                         labels=c("Exercise", "Resistance"))+
-  scale_x_continuous(breaks = c(0,1))
-```
-
-Figure 4, similarly to Figure 4 illustrates individual's changes before and after treatment. Figure 5 shows separate plots for the exercise group and the resistance training group. In most cases there was a slight increase in fitness.  
-
+Figure 4, similarly to Figure 2 illustrates individual's changes before and after treatment with a linear regression line shown in a black dashed line. In most cases individuals had a slight increase in fitness.
 ```{r Figure 4, fig.height=3.1, fig.width=7.5, fig.cap= "This figure aligns with the below table. In this figure each subject is a line, and the color represents their age, since we could expect older individuals to have a different response than younger participants. Time 0 represents pre-treatment and time 1 represents post treatment." }
 df_long$Group1 <- factor(df_long$Group, labels = c("Exercise", "Resistance"))
 vo2 <- df_long[df_long$time == 0,] %>% filter(!duplicated(subj)) 
 vo2 <- rbind(vo2, df_long[df_long$time == 1,] %>% filter(!duplicated(subj))) 
              
 ggplot(data = df_long, aes(x= time, y = vo2max, group = subj, color = Age))+ 
-  geom_line(size = 1.2)+
+  geom_line(size = 1, alpha = 0.85)+
+  geom_smooth(method = 'lm', show.legend = TRUE,aes(group = Group), size = 1, se = FALSE, color = "black",linetype = "dashed")+
   facet_wrap(vars(Group1))+
   scale_color_viridis_c()+
   xlab("Time")+ 
   ylab(expression(paste(VO[2]," Max",sep="")))+
   labs(title = expression("Change in Fitness"))+
-  scale_x_continuous(breaks = c(0,1))
+  scale_x_continuous(breaks = c(0,1))+
+    theme_minimal()+
+   theme(axis.line = element_line(color='black'),
+    plot.background = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank())
 ```
+
+
 
 ```{r Table}
 summ <- df_long[df_long$time == 0,] %>% filter(!duplicated(subj)) %>% group_by(Group,time) %>%                        
@@ -226,28 +239,28 @@ knitr::kable(summ,
              digits = 1, align = "c")
 
 ```
-
 \newpage
+Below is a summary of two linear regression models that fits estimated VO$_2$ max with a predictor of time. Based on the confidence interval of the time coefficients,at the 95% confidence level, there is not a statistically significant difference between fitness before and after treatments. 
 
-Below is a summary of two linear regression models that fits estimated VO$_2$ max with a predictor of time. Based on the standard errors and p-values of the time coefficients,at the 95% confidence level, there is not a statistically significant difference between fitness before and after treatments. 
-
-## Resistance Group
 ```{r}
-summary(lm(formula = vo2max~ time, data = vo2, subset = Group1=="Resistance"))
+mdl_r <- lm(formula = vo2max~ time, data = vo2, subset = Group1=="Resistance")
+mdl_e <- lm(formula = vo2max~ time, data = vo2, subset = Group1=="Exercise")
+
+modelsummary(list("Resistance" = mdl_r, "Exercise" = mdl_e),
+             title='Resistance vs Exercise: Change in Fitness After Treatment',
+             statistic='conf.int',
+             fmt = 1)
+
 ```
 
-## Exercise Group
-```{r}
-summary(lm(formula = vo2max~ time, data = vo2, subset = Group1=="Exercise"))
-```
-
-
 \newpage
-# Change in Brain Region Activation
+# 3. Change in Brain Region Activation
 Figure 5 shows change in brain region activation for each measured region.  If a point falls in the first or third quadrant, their activation remained either positive or negative for both readings, but if a point is in the second or fourth quadrant, the activation changed from either  
 1. negative in the first reading to positive in the second reading or  
 2. positive in the first reading to negative in the second reading. 
-```{r Figure 5, fig.height=3.1, fig.width=7.5, fig.align='center', fig.cap = "The x-axis shows the pre-treatment level of activation and the y-axis shows the post-treatment level for the same participant. Each region shows a slightly different pattern of points, but no single plot stands out as having a distinct pattern."}
+```{r Figure 5, fig.height=5.1, fig.width=7.5, fig.align='center', fig.cap = "The x-axis shows the pre-treatment level of activation and the y-axis shows the post-treatment level for the same participant. Each region shows a slightly different pattern of points, but no single plot stands out as having a distinct pattern."}
+
+
 p3 <- ggplot(df, aes(x = pre_active, y = post_active, colour = Group)) +
   geom_point(shape = "circle", size = 2L) +
   geom_hline(yintercept=0, colour = "grey")+
@@ -264,8 +277,6 @@ p3 <- ggplot(df, aes(x = pre_active, y = post_active, colour = Group)) +
 #ggsave('Fig3.png', p3, height = 6, width = 10)
 p3
 ```
-
-  
 
 # Conclusion 
 Based on the provided data, the exercise intervention leads to impacts of varying degrees depending on the individual. Based on our EDA, there is not a detectable linear relationship between fitness and brain region activation.The differences between control and treatment groups follow a similar pattern and we were not able to detect a significant difference. In future studies we would recommend a larger sample size. We would be happy to consult on suggested sample sizes for future projects. 
