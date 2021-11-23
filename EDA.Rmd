@@ -141,7 +141,7 @@ text_size <- 10
 ```
 
 # 1. Change in VO$_2$ Max   
-The treatment group performed an aerobic/endurance exercise training program for 12 weeks (n=10). The control group performed a resistance training program for 12 weeks (n=5), since resistance training has been shown to not impact cardiopulmonary fitness.  
+The treatment group performed an aerobic/endurance exercise training program for 12 weeks (n=10). The control group performed a resistance training program for 12 weeks (n=5), since resistance training has been shown to not impact cardiopulmonary fitness.  We can only get superficial information from the pictures, not their correlation.
 ```{r Figure 1, echo=FALSE, fig.height=3.1, fig.width=5, fig.align='center', fig.cap="We can see the differing spreads in the treatment and control groups. The minimum and maximum change of VO$_2$ max in the control group is each more extreme than the minimum and maximum in the treatment group. In both groups, most participants have a positive change of max VO$_2$."}
 p2 <- ggplot(df0) +
   aes(y = PostVo2max - PreVo2max, x = Group, color = Group) +
@@ -179,7 +179,7 @@ ggplot(data = df_long, aes(x= as.numeric(time), y = as.numeric(activation), colo
     panel.border = element_blank())
 ```
 
-The abscissa of each point in Figure 3, below, shows the change of VO$_2$ max, and the y axis shows the change in brain region activation. Based on the plot the range of VO$_2$ max in the control group is greater than that in the treatment group.   
+The abscissa of each point in Figure 3, below, shows the change of VO$_2$ max, and the y axis shows the change in brain region activation. Based on the plot the range of VO$_2$ max in the control group is greater than that in the treatment group. The picture only shows  the horizontal and vertical coordinates of the points, on which coordinate axis the points are concentrated. It doesn't show the correlation.
 ```{r Figure 3, fig.height=3.1, fig.width=7.5, fig.align='center', fig.cap="The data are mainly distributed in the first and fourth quadrants. In the entorhinal, hippocampus and parahippocampal regions of the left and right brains, a small number of data in the control group and treatment group had a negative change in VO$_2$ max, and the rest are positive."}
 p1 <- ggplot(data = df, mapping = aes(x = vo2_ch, y = active_ch, colour = Group)) +
   geom_point(shape = "circle", size = 2L) +
@@ -268,6 +268,7 @@ modelsummary(list("Resistance" = mdl_r, "Exercise" = mdl_e),
 Figure 5 shows change in brain region activation for each measured region.  If a point falls in the first or third quadrant, their activation remained either positive or negative for both readings, but if a point is in the second or fourth quadrant, the activation changed from either  
 1. negative in the first reading to positive in the second reading or  
 2. positive in the first reading to negative in the second reading. 
+Unfortunately, we can't see any relationship between Brain region activation and exercise.
 ```{r Figure 5, fig.height=5.1, fig.width=7.5, fig.align='center', fig.cap = "The x-axis shows the pre-treatment level of activation and the y-axis shows the post-treatment level for the same participant. Each region shows a slightly different pattern of points, but no single plot stands out as having a distinct pattern."}
 
 
