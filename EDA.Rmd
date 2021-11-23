@@ -195,7 +195,7 @@ p1
 
 \newpage
 Figure 4, similarly to Figure 2 illustrates individual's changes before and after treatment. This figure shows VO$_2$ max for each individual on the y axis, and on the x axis is the before treatment baseline at zero and the post-treatment fitness at one. The lines are color-coded by age. Closer to yellow indicates older, and closer to purple indicates younger. We hypothesized that age could be a predictor of fitness. A linear regression is shown with a black dashed line with a shaded error region indicating the 95% confidence interval. The wide gray bands indicate a slope that is not statistically significant. In other words, the true difference in before and after treatment fitness levels could be zero.
-```{r Figure 4, fig.height=3.1, fig.width=7.5, fig.cap= "This figure aligns with the below table. In this figure each subject is a line, and the color represents their age, since we could expect older individuals to have a different response than younger participants. Time 0 represents pre-treatment and time 1 represents post treatment." }
+```{r Figure 4, fig.height=3.1, fig.width=7.5, fig.cap="  " }
 df_long$Group1 <- factor(df_long$Group, labels = c("Exercise", "Resistance"))
 vo2 <- df_long[df_long$time == 0,] %>% filter(!duplicated(subj)) 
 vo2 <- rbind(vo2, df_long[df_long$time == 1,] %>% filter(!duplicated(subj))) 
