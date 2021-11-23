@@ -27,9 +27,10 @@ knitr::opts_chunk$set(echo = FALSE,warning = FALSE, message = FALSE)
 pacman::p_load("readxl","GGally","ggpubr","magrittr", "DescTools","dplyr","tidyverse","knitr","sjPlot", "sjmisc","modelsummary")
 ```
 
+
 ```{r Select relevant columns and tidy data}
 #import data
-df0 <- read_excel("master-beta-extract_Razan.xlsx")
+df0 <-master_beta_extract_Razan
 names(df0)[9] <- 'change_vo2'
 
 #The last seven columns include differences pre/post. 
@@ -153,7 +154,7 @@ ggsave('Fig1.png', p2)
 \newpage
 
 # 2. Change in VO$_2$ Max and Brain Activation
-Figure 2 shows the individual's changes in brain region activation before and after treatment and color coded by treatment group. The light background lines represent individual measurements, and the bold line is a linear regression for each group. There is a general trend of increase in region activation, although the standard errors for the regression are large.
+Figure 2 shows the individual changes in brain region activation before and after treatment and color coded by treatment group. The light background lines represent individual measurements, and the bold line is a linear regression for each group. There is a general trend of increase in region activation, although the standard errors for the regression are large. However, we cannot make a conclusions that there is a correlation between fitness and brain activation         based on this graph, because our sample size is relatively small, and the results may be random, so that we cannot make any general conclusion from the results of several people’s experiment.
 ```{r Figure 2, fig.pos='H',fig.height=4.5, fig.width=7.5, fig.align='center', fig.cap = "We can see that, in general, participants had a slight change in region activation , regardless of treatment group, although we also see that some individuals had more extreme changes "}
 ggplot(data = df_long, aes(x= as.numeric(time), y = as.numeric(activation), color = as.factor(Group)))+ 
   geom_line(aes(group = subj), size = 1, alpha = 0.3)+
