@@ -3,6 +3,7 @@ title: "\\fontsize{16pt}{3pt} \\textbf{Group 2's Consulting Report}"
 author: "Kuangyou Chen, Yanbing Chen, Rose Determan, and Biyao Zhang"
 output:
   pdf_document: default
+indent: true
 header-includes:
   - \usepackage{titling}
   - \pretitle{\begin{flushleft}}
@@ -12,7 +13,8 @@ header-includes:
   - \predate{\begin{flushleft}}
   - \postdate{\end{flushleft}}
   - \usepackage{graphicx}
-  - \usepackage{float}  
+  - \usepackage{float} 
+  - \usepackage{indentfirst} 
 geometry: "left=1in,right=1in,top=.8in, bottom=.8in"
 ---
 # Introduction
@@ -25,12 +27,14 @@ hypothesis. Below, we have completed an exploratory data analysis (EDA) with sev
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE,warning = FALSE, message = FALSE)
 pacman::p_load("readxl","GGally","ggpubr","magrittr", "DescTools","dplyr","tidyverse","knitr","sjPlot", "sjmisc","modelsummary")
+
 ```
 
 
 ```{r Select relevant columns and tidy data}
 #import data
-df0 <-master_beta_extract_Razan
+df0<- read_excel("master-beta-extract_Razan.xlsx")
+
 names(df0)[9] <- 'change_vo2'
 
 #The last seven columns include differences pre/post. 
@@ -196,7 +200,7 @@ p1
 
 \newpage
 Figure 4, similarly to Figure 2 illustrates individual's changes before and after treatment. This figure shows VO$_2$ max for each individual on the y axis, and on the x axis is the before treatment baseline at zero and the post-treatment fitness at one. The lines are color-coded by age. Closer to yellow indicates older, and closer to purple indicates younger. We hypothesized that age could be a predictor of fitness. A linear regression is shown with a black dashed line with a shaded error region indicating the 95% confidence interval. The wide gray bands indicate a slope that is not statistically significant. In other words, the true difference in before and after treatment fitness levels could be zero.
-```{r Figure 4, fig.height=3.1, fig.width=7.5, fig.cap="  " }
+```{r Figure 4, echo = FALSE, fig.height=3.1, fig.width=7.5, fig.cap=" Change in fitness by treatment group and age. " }
 df_long$Group1 <- factor(df_long$Group, labels = c("Exercise", "Resistance"))
 vo2 <- df_long[df_long$time == 0,] %>% filter(!duplicated(subj)) 
 vo2 <- rbind(vo2, df_long[df_long$time == 1,] %>% filter(!duplicated(subj))) 
@@ -220,10 +224,10 @@ ggplot(data = vo2, aes(x= time, y = vo2max, group = subj, color = Age))+
 
 
 
-lm(vo2max ~ time, data = vo2)
+#lm(vo2max ~ time, data = vo2)
 ```
 
-
+Table 1 shows the mean and errors of VO$_2$ max before and after treatment for each treatment group. We can see that although the point estimates for the means are different, the lower and upper 95% confidence intervals of the mean overlap which indicates that a statistical difference in the means can not be detected. 
 
 ```{r Table}
 summ <- df_long[df_long$time == 0,] %>% filter(!duplicated(subj)) %>% group_by(Group,time) %>%                        
@@ -245,8 +249,8 @@ knitr::kable(summ,
              digits = 1, align = "c")
 
 ```
-\newpage
-Below is a summary of two linear regression models that fits estimated VO$_2$ max with a predictor of time. Based on the confidence interval of the time coefficients,at the 95% confidence level, there is not a statistically significant difference between fitness before and after treatments. 
+
+Table 2 is a summary of two linear regression models that fit estimated VO$_2$ max with a predictor of time. Similarly to the table of means, based on the confidence interval of the time coefficients, at the 95% confidence level, there is not a statistically significant difference between fitness before and after treatments. 
 
 ```{r}
 mdl_r <- lm(formula = vo2max~ time, data = vo2, subset = Group1=="Resistance")
